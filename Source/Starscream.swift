@@ -174,9 +174,9 @@ public class SSLSecurity {
                 collect.append(SecCertificateCreateWithData(nil,cert)!)
             }
             SecTrustSetAnchorCertificates(trust,collect)
-            var result: SecTrustResultType = .Unspecified
+            var result = UInt32(kSecTrustResultUnspecified)
             SecTrustEvaluate(trust,&result)
-            if result == .Unspecified || result == .Proceed {
+            if result == UInt32(kSecTrustResultUnspecified) || result == UInt32(kSecTrustResultProceed) {
                 var trustedCount = 0
                 for serverCert in serverCerts {
                     for cert in certs {
@@ -219,8 +219,8 @@ public class SSLSecurity {
         SecTrustCreateWithCertificates(cert, policy, &possibleTrust)
 
         guard let trust = possibleTrust else { return nil }
-
-        var result: SecTrustResultType = .Unspecified
+        
+        var result: SecTrustResultType = UInt32(kSecTrustResultUnspecified)
         SecTrustEvaluate(trust, &result)
         return SecTrustCopyPublicKey(trust)
     }
@@ -516,7 +516,7 @@ public class WebSocket: NSObject, NSStreamDelegate {
 
         var port = url.port
         if port == nil {
-            if let scheme = url.scheme where ["wss", "https"].contains(scheme) {
+            if ["wss", "https"].contains(url.scheme) {
                 port = 443
             } else {
                 port = 80
@@ -574,7 +574,7 @@ public class WebSocket: NSObject, NSStreamDelegate {
         guard let inStream = inputStream, let outStream = outputStream else { return }
         inStream.delegate = self
         outStream.delegate = self
-        if let scheme = url.scheme where ["wss", "https"].contains(scheme) {
+        if ["wss", "https"].contains(url.scheme) {
             inStream.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
             outStream.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
         } else {
